@@ -1,0 +1,7 @@
+# Pianodes own pianobar config
+# This file is created automatically
+
+tls_fingerprint = 2D0AFDAFA16F4B5C0A43F3CB1D4752F9535507C0
+history = 10
+#control_proxy = http://216.250.7.197:8090/
+control_proxy = http://24.172.34.114:8181/

@@ -1,7 +1,37 @@
-var pianode = require('../pianode.js');
+var Pianode = require('../pianode.js');
 
-//pianode.on('' function() {
-//
-//});
+var pandora = new Pianode({
+  verbose: true
+});
 
-pianode.start();
+console.log('pianode object created.');
+
+pandora.on('error', function(error) {
+  console.log('! %s: %s !', error.type, error.text);
+});
+
+pandora.on('statusChange', function(statusChange) {
+  console.log('[ %s > %s ]',statusChange.prevStatus, statusChange.status);
+});
+
+pandora.on('close', function(code) {
+  console.log('| Closing with code %s |', code);
+});
+
+pandora.on('songChange', function(song) {
+  console.log('> Now playing %s from %s <', song.name, song.artist);
+});
+
+pandora.on('stationChange', function(station) {
+  console.log('> Now listening to %s <', station.name);
+});
+
+pandora.on('timeChange', function(time) {
+  // ...
+});
+
+console.log('pianode event listeners added.');
+
+pandora.start();
+
+console.log('pianode started.');

@@ -3,197 +3,130 @@
 
 var spawn = require('child_process').spawn;
 var events = require('events');
-var merge = require('deepmerge');
+var deepmerge = require('deepmerge');
 var fs = require('fs');
+var processIo = require('./lib/processIo.js');
+var pianodeRoot = __dirname+'';
 
+function Pianode(userOptions) {
+  var pianode = this;
+  events.EventEmitter.call(pianode);
 
-var eventEmitter = new events.EventEmitter();
-
-var options = {
-  station: 10,
-  verbose: true,
-//  verbose: false,
-  errorLog: true
-};
-
-var status = 'not running';
-var prevStatus = 'undefined';
-function setStatus(newStatus) {
-  if (newStatus !== status) {
-    // Status changed!
-    var statusChange = {
-      status: newStatus,
-      prevStatus: status
-    };
-    eventEmitter.emit('statusChange', statusChange);
-    prevStatus = status;
-    status = newStatus;
-  }
-}
-function getStatus() {
-  return {
-    status: status,
-    prevStatus: prevStatus
+  var options = {
+    station: 'Q',
+    verbose: false,
+    logErrors: true
   };
-}
+  if(userOptions) {
+    options = deepmerge(options, userOptions);
+  }
 
-function log(string) {
-  if(options.verbose) process.stdout.write(string);
-}
-function errorLog(string) {
-  if(options.errorLog) process.stdout.write(string);
-}
+  var state = {};
+  var setState = function(newState) {
+    state = deepmerge(state, newState);
+  };
+  var setStateOff = function() {
+    setState({
+      running: false,
+      loggedIn: false,
+      playing: false
+    });
+  };
+  setStateOff();
+  var getState = function() {
+    return state;
+  };
+  pianode.getState = getState;
 
-function start() {
-  var pianobar = spawn('pianobar', [], {
-    //stdio: 'ignore',
-    stdio: 'pipe',
-    env: process.env
-  });
-
-  pianobar.stdout.on('data', function(data) {
-    log('' + data);
-
-    // [?] Select station:
-    if (/\[\?\] Select station:/.test(data)) {
-      log('Station selection detected!\n');
-    
-      pianobar.stdin.write(options.station + '\n');
-      pianobar.stdin.end();
-    
-      eventEmitter.emit('selectStation');
+  var status = 'not running';
+  var prevStatus = 'undefined';
+  var setStatus = function(newStatus) {
+    if (newStatus !== status) {
+      pianode.emit('statusChange', {
+        status: newStatus,
+        prevStatus: status
+      });
+      prevStatus = status;
+      status = newStatus;
     }
-    // |>  "Die Young" by "Kesha" on "Warrior (Deluxe Version)" @ Today's Hits
-    else if (/\|\>  "(.+)" by "(.+)" on "(.+)" @ (.+)/.test(data)) {
-      log('Song change detected!\n');
-      var m = (data+'').match(/\|\>  "(.+)" by "(.+)" on "(.+)" @ (.+)/);
-      var song = {
-        name: m[1],
-        artist: m[2],
-        album: m[3],
-        playlist: m[4]
-      };
-      log('Song: '+m[1]+', Artist: '+m[2]+', Album: '+m[3]+', Playlist: '+m[4]+'\n');
-    
-      eventEmitter.emit('songChange', song);
-    }
-    // |>  Station "QuickMix" (1057370371552570017)
-    else if (/\|\>  Station "(.+)" \((.+)\)/.test(data)) {
-      log('Station change detected!\n');
-      var m = (data+'').match(/\|\>  Station "(.+)" \((.+)\)/);
-      var station = {
-        name: m[1],
-        id: m[2]
-      }
-      log('Station: '+station.name+', Id: '+station.id+'\n');
-    
-      eventEmitter.emit('stationChange', station);
-    }
-    // #   -04:24/04:31
-    else if (/\#   \-([0-9][0-9])\:([0-9][0-9])\/([0-9][0-9])\:([0-9][0-9])/.test(data)) {
-      var m = (data+'').match(/\#   \-([0-9][0-9])\:([0-9][0-9])\/([0-9][0-9])\:([0-9][0-9])/);
-      var time = {};
-      time.remaining = {
-        string: m[1]+':'+m[2],
-        seconds: (m[1]*60) + m[2]
-      };
-      time.total = {
-        string: m[3]+':'+m[4],
-        seconds: (m[3]*60) + m[4]
-      };
-      time.played = {};
-      time.played.seconds = time.total.seconds - time.remaining.seconds;
-      time.played.string = Math.floor(time.played.seconds / 60)+':'+(time.played.seconds % 60);
-      time.string = '-'+time.remaining.string+'/'+time.total.string;
-      time.percent = (time.played.seconds / (time.total.seconds / 100));
-      
-      eventEmitter.emit('timeChange', time);
-      setStatus('playing');
-    }
-    // (i) Login...
-    else if (/\(i\) Login\.\.\./.test(data)) {
-      setStatus('logging in');
-    }
-    // (i) Get stations...
-    else if (/\(i\) Get stations\.\.\./.test(data)) {
-      setStatus('receiving stations');
-    }
-    // (i) Receiving new playlist...
-    else if (/\(i\) Receiving new playlist\.\.\./.test(data)) {
-      setStatus('receiving playlist');
-    }
-    // (i) Receiving explanation...
-    else if (/\(i\) Receiving explanation\.\.\./.test(data)) {
-      setStatus('receiving explanation');
-    }
-    // Network error: Timeout.
-    else if (/Network error\: Timeout\./.test(data)) {
-      errorLog('Network error: Timeout.\n');
-      var err = {
-        type: 'Network error',
-        text: 'Network error: Timeout.'
-      };
-      eventEmitter.emit('error', err);
-      setStatus('error');
-    }
-    // Network error: TLS handshake failed.
-    else if (/Network error\: TLS handshake failed\./.test(data)) {
-      errorLog('Network error: TLS handshake failed.\n');
-      var err = {
-        type: 'Network error',
-        text: 'Network error: TLS handshake failed.'
-      };
-      eventEmitter.emit('error', err);
-      setStatus('error');
-    }
-    // Network error: Read error.
-    else if (/Network error\: Read error\./.test(data)) {
-      errorLog('Network error: Read error.\n');
-      var err = {
-        type: 'Network error',
-        text: 'Network error: Read error.'
-      };
-      eventEmitter.emit('error', err);
-      setStatus('error');
-    }
-    // Error: Pandora is not available in your country. Set up a control proxy (see manpage).
-    else if (/Error\: Pandora is not available in your country\. Set up a control proxy \(see manpage\)\./.test(data)) {
-      errorLog('Error: Pandora is not available in your country. Set up a control proxy (see manpage).\n');
-      var err = {
-        type: 'Pianobar error',
-        text: 'Error: Pandora is not available in your country. Set up a control proxy (see manpage).'
-      };
-      eventEmitter.emit('error', err);
-      setStatus('error');
-    }
-    // /!\ Cannot access audio file: Forbidden.
-    else if (/\/\!\\ Cannot access audio file\: Forbidden\./.test(data)) {
-      errorLog('Error: Cannot access audio file: Forbidden.');
-      var err = {
-        type: 'Pianobar error',
-        text: 'Cannot access audio file: Forbidden.'
-      };
-      eventEmitter.emit('error', err);
-      setStatus('error');
-    }
-  });
-
-  pianobar.stderr.on('data', function(data) {
-    errorLog('stderr: ' + data);
-    var err = {
-      type: 'Unknown error',
-      text: data+''
+  };
+  var getStatus = function() {
+    return {
+      status: status,
+      prevStatus: prevStatus
     };
-    eventEmitter.emit('error', err);
-    setStatus('error');
-  });
+  };
+  pianode.getStatus = getStatus;
 
-  pianobar.on('close', function(code) {
-    errorLog('Exited with code ' + code + '.');
-    eventEmitter.emit('close', code);
+  var log = function(message) {
+    if(options.verbose) console.log(message);
+  };
+  var logError = function(message) {
+    if(options.logErrors) console.log(message);
+  };
+
+  var pianobar = null;
+  var pianobarPath = pianodeRoot+'/pianobar/pianobar';
+  var pianobarConfigPrefix = pianodeRoot; // resulting in [prefix]/pianobar/config
+
+  pianode.start = function() {
+    pianobar = spawn(pianobarPath, [ ], {
+      stdio: 'pipe',
+      env: deepmerge(process.env, {
+        XDG_CONFIG_HOME: pianobarConfigPrefix
+      })
+    });
+
+    pianobar.stdout.on('data', function(data) {
+      log('' + data);
+
+      // Call routes
+      processIo({
+        data: data,
+        write: function(data) {
+          pianobar.stdin.write(data + '\n');
+          pianobar.stdin.end();
+        },
+        emit: function(event, obj) {
+          pianode.emit(event, obj);
+        },
+        setStatus: setStatus,
+        log: log,
+        logError: logError,
+        options: options,
+        getState: getState,
+        setState: setState,
+        setStateOff: setStateOff
+      });
+    });
+
+    pianobar.stderr.on('data', function(data) {
+      logError('Pianobar error: ' + data);
+      pianode.emit('error', {
+        type: 'Unknown error',
+        text: data+''
+      });
+      setStatus('error');
+      setStateOff();
+    });
+
+    pianobar.on('close', function(code) {
+      logError('Pianobar exited with code ' + code + '.');
+      pianode.emit('close', code);
+      setStatus('not running');
+      setStateOff();
+    });
+  };
+
+  process.on('exit', function() {
+    if(pianobar) {
+      log('Pianode closing. Killing pianobar.');
+      pianobar.kill();
+    }
     setStatus('not running');
+    setStateOff();
+    pianode.emit('exit');
   });
 }
-
-exports.start = start;
-exports.events = eventEmitter;
+Pianode.prototype.__proto__ = events.EventEmitter.prototype;
+module.exports = Pianode;

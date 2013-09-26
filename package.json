@@ -1,15 +1,34 @@
 {
   "name": "pianode",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "description": "Node.js package to run pianobar (a commandline pandora client) headless, install it and manage all settings.",
+  "keywords": [
+    "pianobar",
+    "music",
+    "pandora",
+    "radio",
+    "linux"
+  ],
+  "author": "Philipp Widdra <philipp.widdra@googlemail.com>",
+  "readmeFilename": "README.md",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/philippwiddra/pianode.git"
+  },
+  "license": "MIT",
   "dependencies": {
     "deepmerge": "0.2.5"
   },
   "engines": {
-    "node": "0.10.x",
-    "npm": "1.2.x"
+    "node": ">= 0.10.x",
+    "npm": ">= 1.2.x"
   },
   "scripts": {
-    "start": "node pianode.js"
-  }
+    "start": "node pianode.js",
+    "preinstall": "node lib/install.js",
+    "install": "node lib/install.js",
+    "uninstall": "node lib/install.js"
+  },
+  "os": [ "!win32" ]
 }
