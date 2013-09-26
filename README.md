@@ -1,6 +1,6 @@
 # Pianode
 
-Node.js package to run [pianobar](https://github.com/PromyLOPh/pianobar)(a [pandora.com](http://www.pandora.com/) console client) headless, install it and manage all settings.
+[Node.js](http://nodejs.org/) package to run [pianobar](https://github.com/PromyLOPh/pianobar) (a [pandora.com](http://www.pandora.com/) console client) headless, install it and manage all settings.
 
 ## Table Of Contents
 1. [Installation](#installation)
