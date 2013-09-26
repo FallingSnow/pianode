@@ -1,8 +1,9 @@
 # Pianode
 
-Node.js package to run pianobar headless, install it and manage all settings.
+Node.js package to run [pianobar](https://github.com/PromyLOPh/pianobar) headless, install it and manage all settings.
 
 ## Table Of Contents
+1. [Installation](#installation)
 1. [Events](#events)
 1. [Status values](#status-values)
 1. [Functions](#functions)
@@ -10,6 +11,29 @@ Node.js package to run pianobar headless, install it and manage all settings.
 1. [Error Types](#error-types)
 1. [Options](#options)
 1. [ToDo](#todo)
+
+## Installation
+
+To use this package, just add it to your applications dependencies (package.json) and run `npm install`.
+You can also install it for the current directory with `npm install https://github.com/philippwiddra/pianode/archive/master.tar.gz`
+
+The only thing you have to make sure additionally is that the listed lib dependencies are installed:
+
+- libao-dev
+- libmad0-dev
+- libfaad-dev
+- libgnutls-dev
+- libjson0-dev
+- libgcrypt11-dev
+
+If your distribution uses `apt` just run this command, if not find and install the above listed packages in the available package manager. They are available for a lot of other distributions under the same name.
+
+``` bash
+sudo apt-get install libao-dev libmad0-dev libfaad-dev libgnutls-dev libjson0-dev libgcrypt11-dev
+```
+
+All other dependencies (including pianobar itself) will be installed with `npm`.
+Pianode won't mess with your local pianobar installation (if you have one), it builds a totally new one and won't touch your configuration files at all, it loads the configuration from inside the pianode packagefiles (pianode/pianobar/config).
 
 ## Events
 Form: `'eventName'` (parameterType **additionalParameter**)
