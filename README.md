@@ -1,6 +1,6 @@
 # Pianode
 
-Node.js package to run [pianobar](https://github.com/PromyLOPh/pianobar) headless, install it and manage all settings.
+Node.js package to run [pianobar](https://github.com/PromyLOPh/pianobar)(a [pandora.com](http://www.pandora.com/) console client) headless, install it and manage all settings.
 
 ## Table Of Contents
 1. [Installation](#installation)
@@ -153,6 +153,8 @@ ok      | (i) Receiving explanation...
 ??      | [?] Select station:
         | [?] Select song:
         | [?] What to do with this song?
+        | [?] Password:
+        | [?] Email:
 ok      | &#124;>  Station "QuickMix" (1057370371552570017)
 ok      | &#124;>  "Ice Ice Baby" by "Vanilla Ice" on "To The Extreme" @ 90s Pop Radio
 ok      | #   -04:24/04:31
