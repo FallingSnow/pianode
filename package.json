@@ -10,11 +10,17 @@
     "linux"
   ],
   "author": "Philipp Widdra <philipp.widdra@googlemail.com>",
+  "homepage": "https://github.com/philippwiddra/pianode",
   "readmeFilename": "README.md",
+  "main": "pianode.js",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git://github.com/philippwiddra/pianode.git"
+    "url": "https://github.com/philippwiddra/pianode.git"
+  },
+  "issues": {
+    "url": "https://github.com/philippwiddra/pianode/issues",
+    "email": "philipp.widdra@googlemail.com"
   },
   "license": "MIT",
   "dependencies": {
