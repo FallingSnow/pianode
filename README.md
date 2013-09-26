@@ -49,6 +49,8 @@ Form: `'eventName'` (parameterType **additionalParameter**)
 - `'songChange'` [(object **song**)](#song)
 - `'stationChange'` [(object **station**)](#station)
 - `'timeChange'` [(object **time**)](#time)
+- `'emailRequest'`
+- `'passwordRequest'`
 
 ## Status Values
 - `'not running'`
@@ -62,9 +64,16 @@ Form: `'eventName'` (parameterType **additionalParameter**)
 
 
 ## Functions
+
+- `start()`
+    - Starts the pianobar client as child process
 - `getStatus()`
     - returns [(object **statusChange**)](#statuschange)
-
+- `getState()`
+    - returns (object **state**)
+- `on(event, callback)`
+    - The callback is called with a specific object as parameter when the given event occurrs
+    
     
 ## Objects
 
@@ -142,6 +151,19 @@ var options = {
 
 ## ToDo
 
+**Problems:**
+- pianobarConfig.js
+- Swap proxys
+- How do upvoted songs appear?
+    - in Songlist
+    - when playing
+- Windows support with [thedmd/pianobar-windows](https://github.com/thedmd/pianobar-windows)?
+    - neccessary to build on target maschine every time or are binarys enough
+    - config named pianobar.cfg
+    - executable?
+
+**Pianobar statusmessage coverage**
+
 Status  |  Message
 :------:|:----------
 ok      | /!\ Cannot access audio file: Forbidden.
@@ -150,15 +172,17 @@ ok      | (i) Get stations...
 ok      | (i) Receiving new playlist...
 ok      | (i) Receiving explanation...
         | (i) No history yet.
-??      | [?] Select station:
+ok      | [?] Select station:
         | [?] Select song:
         | [?] What to do with this song?
-        | [?] Password:
-        | [?] Email:
+ok      | [?] Password:
+ok      | [?] Email:
 ok      | &#124;>  Station "QuickMix" (1057370371552570017)
 ok      | &#124;>  "Ice Ice Baby" by "Vanilla Ice" on "To The Extreme" @ 90s Pop Radio
 ok      | #   -04:24/04:31
         | 0) q   90s Pop Radio
+        | 0) Q   90s Pop Radio
+        | 0)     90s Pop Radio
         | 0) Aerosmith - I Don't Want To Miss A Thing
         | 0) Aphrodite - Return To Jedda
 ok      | Network error: Read error.
@@ -166,3 +190,21 @@ ok      | Network error: Timeout.
 ok      | Network error: TLS handshake failed.
 ok      | Error: Pandora is not available in your country. Set up a control proxy (see manpage).
 
+**Functions:**
+
+- Standalone
+    - playPause()
+    - play()
+    - pause()
+    - next()
+    - love()
+    - ban()
+- Emitting events
+    - history()
+        - how to differ from upcoming?
+        - "no history yes" possible!
+    - upcoming()
+        - how to differ from history?
+    - explain()
+- Requesting input
+    - switchStation(identifier)

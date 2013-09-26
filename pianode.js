@@ -12,15 +12,22 @@ function Pianode(userOptions) {
   var pianode = this;
   events.EventEmitter.call(pianode);
 
+  // Check if userOptions hold all neccessary fields
+  if(!(userOptions.password && userOptions.email)) {
+    throw 'Pianode error: You have to specify pandora.com credentials.';
+  }
+  
   var options = {
     station: 'Q',
     verbose: false,
-    logErrors: true
+    logErrors: true,
+    password: '',
+    email: ''
   };
   if(userOptions) {
     options = deepmerge(options, userOptions);
   }
-
+  
   var state = {};
   var setState = function(newState) {
     state = deepmerge(state, newState);
