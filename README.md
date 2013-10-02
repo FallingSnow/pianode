@@ -58,6 +58,7 @@ Form: `'eventName'` (parameterType **additionalParameter**)
 - `'undefined'`
 - `'logging in'`
 - `'playing'`
+- `'paused'`
 - `'receiving stations'`
 - `'receiving playlist'`
 - `'receiving explanation'`
@@ -193,7 +194,7 @@ ok      | Error: Pandora is not available in your country. Set up a control prox
 **Functions:**
 
 - Standalone
-    - ~~playPause()~
+    - ~~playPause()~~
     - ~~play()~~
     - ~~pause()~~
     - ~~next()~~
