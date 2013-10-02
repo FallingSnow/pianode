@@ -219,9 +219,9 @@ ok      | Error: Pandora is not available in your country. Set up a control prox
 - Requesting input
     - switchStation(identifier)
     - songMove(newStation) *???*
-    - stationCreate(*???*) *???*
-    - stationDelete(*???*) *???*
-    - stationRename(*???*) *???*
-    - manageStation(*???*) *???*
-    - stationAddMusic(*???*) *???*
-    - stationAddByGenre(*???*) *???*
+    - stationCreate() *???*
+    - stationDelete() *???*
+    - stationRename() *???*
+    - manageStation() *???*
+    - stationAddMusic() *???*
+    - stationAddByGenre() *???*
