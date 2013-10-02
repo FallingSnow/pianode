@@ -7,6 +7,7 @@ var deepmerge = require('deepmerge');
 var fs = require('fs');
 var processIo = require('./lib/processIo.js');
 var pianodeRoot = __dirname+'';
+var functions = require('./lib/functions.js');
 
 function Pianode(userOptions) {
   var pianode = this;
@@ -76,12 +77,35 @@ function Pianode(userOptions) {
   var pianobarPath = pianodeRoot+'/pianobar/pianobar';
   var pianobarConfigPrefix = pianodeRoot; // resulting in [prefix]/pianobar/config
 
+  pianode.playPause = functions.playPause;
+  pianode.play = functions.play;
+  pianode.pause = functions.pause;
+  pianode.next = functions.next;
+  pianode.love = functions.love;
+  pianode.ban = functions.ban;
+  //pianode.history = functions.history;
+  //pianode.upcoming = functions.upcoming;
+  //pianode.explain = functions.explain;
+  //pianode.switchStation = functions.switchStation;
+
   pianode.start = function() {
     pianobar = spawn(pianobarPath, [ ], {
       stdio: 'pipe',
       env: deepmerge(process.env, {
         XDG_CONFIG_HOME: pianobarConfigPrefix
       })
+    });
+
+    functions.setUp({
+      write: function(data) {
+        pianobar.stdin.write(data + '\n');
+        //pianobar.stdin.end();
+      },
+      setStatus: setStatus,
+      getStatus: function() {
+        return getStatus().status;
+      },
+      setState: setState
     });
 
     pianobar.stdout.on('data', function(data) {
@@ -92,7 +116,7 @@ function Pianode(userOptions) {
         data: data,
         write: function(data) {
           pianobar.stdin.write(data + '\n');
-          pianobar.stdin.end();
+          //pianobar.stdin.end();
         },
         emit: function(event, obj) {
           pianode.emit(event, obj);

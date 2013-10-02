@@ -1,6 +1,6 @@
 {
   "name": "pianode",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Node.js package to run pianobar (a commandline pandora client) headless, install it and manage all settings.",
   "keywords": [
     "pianobar",

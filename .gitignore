@@ -1,5 +1,7 @@
 node_modules/
 
+examples/settings.js
+
 pianobar/pianobar
 pianobar/src/libpiano/crypt.d
 pianobar/src/libpiano/crypt.o

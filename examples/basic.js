@@ -1,6 +1,9 @@
 var Pianode = require('../pianode.js');
+var settings = require('./settings.js');
 
 var pandora = new Pianode({
+  email: settings.email,
+  password: settings.password,
   verbose: true
 });
 
@@ -26,8 +29,15 @@ pandora.on('stationChange', function(station) {
   console.log('> Now listening to %s <', station.name);
 });
 
+
+var count = 0;
 pandora.on('timeChange', function(time) {
-  // ...
+  if (count <= 20) {
+    count++;
+  } else {
+    count = 0;
+    pandora.next();
+  }
 });
 
 console.log('pianode event listeners added.');

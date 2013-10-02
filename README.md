@@ -193,18 +193,34 @@ ok      | Error: Pandora is not available in your country. Set up a control prox
 **Functions:**
 
 - Standalone
-    - playPause()
-    - play()
-    - pause()
-    - next()
-    - love()
-    - ban()
+    - ~~playPause()~
+    - ~~play()~~
+    - ~~pause()~~
+    - ~~next()~~
+    - ~~love()~~
+    - ~~ban()~~
+    - volumeUp()
+    - volumeDown()
+    - volumeReset()
+    - tired()
+    - selectQuickMix() *???*
+    - quit()
+    - bookmark() *???*
+    - stationCreateFromSong() *???*
 - Emitting events
     - history()
         - how to differ from upcoming?
-        - "no history yes" possible!
+        - *"no history yet"* possible!
     - upcoming()
         - how to differ from history?
-    - explain()
+    - songExplain()
+    - songInfo()
 - Requesting input
     - switchStation(identifier)
+    - songMove(newStation) *???*
+    - stationCreate(*???*) *???*
+    - stationDelete(*???*) *???*
+    - stationRename(*???*) *???*
+    - manageStation(*???*) *???*
+    - stationAddMusic(*???*) *???*
+    - stationAddByGenre(*???*) *???*
