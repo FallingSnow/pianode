@@ -85,10 +85,13 @@ function Pianode(userOptions) {
     pianode.next = functions.next;
     pianode.love = functions.love;
     pianode.ban = functions.ban;
-    //pianode.history = functions.history;
+    pianode.history = functions.history;
     //pianode.upcoming = functions.upcoming;
-    //pianode.explain = functions.explain;
+    pianode.explain = functions.explain;
     //pianode.switchStation = functions.switchStation;
+    //pianode.createStation = functions.createStation;
+    //pianode.addMusicToStation = functions.addMusicToStation;
+    
 
     pianode.start = function() {
         console.log(pianobarPath);
