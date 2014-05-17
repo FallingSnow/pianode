@@ -12,7 +12,7 @@ var spawn = require('child_process').spawn
 function Pianode(userOptions) {
     var pianode = this;
     events.EventEmitter.call(pianode);
-
+    
     // Check if userOptions hold all neccessary fields
     if (!(userOptions.password && userOptions.email)) {
         throw 'Pianode error: You have to specify pandora.com credentials.';
@@ -151,9 +151,6 @@ function Pianode(userOptions) {
             setStateOff();
         });
     };
-
-    process.on('exit', pianode.stop);
-    process.on('SIGINT', pianode.stop);
     
     pianode.stop = function() {
         if (pianobar) {
@@ -164,6 +161,10 @@ function Pianode(userOptions) {
         setStateOff();
         pianode.emit('exit');
     };
+
+    process.on('exit', pianode.stop);
+    process.on('SIGINT', pianode.stop);
+    
 }
 Pianode.prototype.__proto__ = events.EventEmitter.prototype;
 module.exports = Pianode;
