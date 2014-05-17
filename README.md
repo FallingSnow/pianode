@@ -14,8 +14,9 @@
 
 ## Installation
 
-To use this package, just add it to your applications dependencies (package.json) and run `npm install`.
-You can also install it for the current directory with `npm install https://github.com/philippwiddra/pianode/archive/master.tar.gz`
+To use this package within your own application, just add it to your application's dependencies (package.json) and run `npm install` in your application's directory.
+
+You can also install it seperately in your current directory with `npm install https://github.com/FallingSnow/pianode/archive/master.tar.gz`
 
 The only thing you have to make sure additionally is that the listed lib dependencies are installed:
 
@@ -32,7 +33,9 @@ If your distribution uses `apt` just run this command, if not find and install t
 sudo apt-get install libao-dev libmad0-dev libfaad-dev libgnutls-dev libjson0-dev libgcrypt11-dev
 ```
 
-All other dependencies (including pianobar itself) will be installed with `npm`.
+Next run this installation script for pianobar using `node lib/install.js`
+
+All other dependencies (including pianobar itself) will be installed automatically with `npm`.
 Pianode won't mess with your local pianobar installation (if you have one), it builds a totally new one and won't touch your configuration files at all, it loads the configuration from inside the pianode packagefiles (pianode/pianobar/config).
 
 ## Events
