@@ -89,12 +89,15 @@ function Pianode(userOptions) {
     //pianode.upcoming = functions.upcoming;
     pianode.explain = functions.explain;
     //pianode.switchStation = functions.switchStation;
-    //pianode.createStation = functions.createStation;
-    //pianode.addMusicToStation = functions.addMusicToStation;
+    pianode.createStation = functions.createStation;
+    pianode.createStationFrom = functions.createStationFrom;
+    pianode.addMusicToStation = functions.addMusicToStation;
+    pianode.getStationList = functions.getStationList;
+    pianode.changeStation = functions.changeStation;
     
 
     pianode.start = function() {
-        console.log(pianobarPath);
+        
         pianobar = spawn(pianobarPath, [], {
             stdio: 'pipe',
             env: _.extend(process.env, {
@@ -115,7 +118,7 @@ function Pianode(userOptions) {
         });
 
         pianobar.stdout.on('data', function(data) {
-            log('' + data);
+            log(data.toString());
 
             // Call routes
             processIo({

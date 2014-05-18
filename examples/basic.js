@@ -4,7 +4,8 @@ var Pianode = require('../pianode.js')
 var pandora = new Pianode({
     email: settings.email,
     password: settings.password,
-    verbose: false
+    verbose: true,
+    debug: false
 });
 
 console.log('pianode object created.');
@@ -32,7 +33,7 @@ pandora.on('stationChange', function(station) {
 
 var count = 0;
 pandora.on('timeChange', function(time) {
-    if (count <= 10) {
+    if (count <= 20) {
         count++;
     } else {
         count = 0;
