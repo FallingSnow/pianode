@@ -6,13 +6,13 @@ var spawn = require('child_process').spawn
         , _ = require('underscore')
         , fs = require('fs')
         , processIo = require('./lib/processIo.js')
-        , pianodeRoot = __dirname + '/pianobar'
+        , pianodeRoot = __dirname
         , functions = require('./lib/functions.js');
 
 function Pianode(userOptions) {
     var pianode = this;
     events.EventEmitter.call(pianode);
-    
+
     // Check if userOptions hold all neccessary fields
     if (!(userOptions.password && userOptions.email)) {
         throw 'Pianode error: You have to specify pandora.com credentials.';
@@ -75,10 +75,10 @@ function Pianode(userOptions) {
             console.log(message);
     };
 
-    var pianobar = null;
-    var pianobarPath = pianodeRoot + '/pianobar';
-    var pianobarConfigPrefix = pianodeRoot; // resulting in [prefix]/pianobar/config
+    var pianobar = null
+            , pianobarPath = pianodeRoot + '/pianobar/pianobar';
 
+    // Functions
     pianode.playPause = functions.playPause;
     pianode.play = functions.play;
     pianode.pause = functions.pause;
@@ -88,20 +88,19 @@ function Pianode(userOptions) {
     pianode.history = functions.history;
     //pianode.upcoming = functions.upcoming;
     pianode.explain = functions.explain;
-    //pianode.switchStation = functions.switchStation;
     pianode.createStation = functions.createStation;
     pianode.createStationFrom = functions.createStationFrom;
     pianode.addMusicToStation = functions.addMusicToStation;
     pianode.getStationList = functions.getStationList;
     pianode.changeStation = functions.changeStation;
-    
+
 
     pianode.start = function() {
-        
+
         pianobar = spawn(pianobarPath, [], {
             stdio: 'pipe',
             env: _.extend(process.env, {
-                XDG_CONFIG_HOME: pianobarConfigPrefix
+                XDG_CONFIG_HOME: pianodeRoot // results in [pianodeRoot]/pianobar/config
             })
         });
 
@@ -157,7 +156,7 @@ function Pianode(userOptions) {
             setStateOff();
         });
     };
-    
+
     pianode.stop = function() {
         if (pianobar) {
             log('Pianode closing. Killing pianobar.');
@@ -170,7 +169,7 @@ function Pianode(userOptions) {
 
     process.on('exit', pianode.stop);
     process.on('SIGINT', pianode.stop);
-    
+
 }
 Pianode.prototype.__proto__ = events.EventEmitter.prototype;
 module.exports = Pianode;

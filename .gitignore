@@ -29,3 +29,6 @@ pianobar/src/ui_dispatch.d
 pianobar/src/ui_dispatch.o
 pianobar/src/ui_readline.d
 pianobar/src/ui_readline.o
+
+nbproject
+/nbproject/

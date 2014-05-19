@@ -4,8 +4,7 @@ var Pianode = require('../pianode.js')
 var pandora = new Pianode({
     email: settings.email,
     password: settings.password,
-    verbose: true,
-    debug: false
+    verbose: true
 });
 
 console.log('pianode object created.');
