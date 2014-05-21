@@ -7,10 +7,54 @@ var spawn = require('child_process').spawn
         , fs = require('fs')
         , processIo = require('./lib/processIo.js')
         , pianodeRoot = __dirname
-        , functions = require('./lib/functions.js');
+        , functions = require('./lib/functions.js')
+        , net = require('net')
+        , sock
+        , sockPath = pianodeRoot + '/pianobar/interpreter.sock';
 
 function Pianode(userOptions) {
     var pianode = this;
+
+    pianode.currentInfo = {};
+
+    // Create socket file for events
+    pianode.socket = net.createServer(function(c) { //'connection' listener
+        console.log('Socket: Created');
+        c.on('data', function(data) {
+            pianode.currentInfo = JSON.parse(data);
+        }).on('error', function(err) {
+            console.error('Socket error:', err);
+        }).end('end', function() {
+            console.log('Socket: End of data');
+        });
+    });
+
+    pianode.socket.socketConnections = [];
+    pianode.socket.on('connection', function(socket) {
+        pianode.socket.socketConnections.push(socket);
+    });
+
+    pianode.socket.on('error', function(e) {
+        if (e.code === 'EADDRINUSE') {
+            var clientSocket = new net.Socket();
+            clientSocket.on('error', function(e) { // handle error trying to talk to server
+                if (e.code === 'ECONNREFUSED') {  // No other server listening
+                    fs.unlinkSync(sockPath);
+                    pianode.socket.listen(sockPath, function() { //'listening' listener
+                        console.log('Socket: Server recovered');
+                    });
+                }
+                clientSocket.connect({path: sockPath}, function() {
+                    throw 'Socket: Running, giving up...';
+                });
+            });
+        }
+    });
+
+    pianode.socket.listen(sockPath, function() {
+        console.log('Socket: Listening!');
+    });
+
     events.EventEmitter.call(pianode);
 
     // Check if userOptions hold all neccessary fields
@@ -158,6 +202,9 @@ function Pianode(userOptions) {
     };
 
     pianode.stop = function() {
+        if (pianode.stopping)
+            return;
+        pianode.stopping = true;
         if (pianobar) {
             log('Pianode closing. Killing pianobar.');
             pianobar.kill();
@@ -165,6 +212,12 @@ function Pianode(userOptions) {
         setStatus('not running');
         setStateOff();
         pianode.emit('exit');
+
+        pianode.socket.close();
+
+        setTimeout(function() {
+            process.exit();
+        }, 300);
     };
 
     process.on('exit', pianode.stop);

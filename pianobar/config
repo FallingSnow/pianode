@@ -37,9 +37,10 @@
 # Misc
 audio_format = mp3
 audio_quality = normal
-#autostart_station = 
+#autostart_station = 334061779151755777
 # Found after inital selection on radio station
-#event_command = 
+#tls_fingerprint = 
+event_command = /root/node/pianode/pianobar/event_converter.sh
 #fifo = /home/pi/.config/pianobar/ctl
 #sort = quickmix_10_name_az
 #love_icon = [+]
