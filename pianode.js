@@ -96,12 +96,12 @@ function Pianode(userOptions) {
     var prevStatus = 'undefined';
     var setStatus = function(newStatus) {
         if (newStatus !== status) {
+            prevStatus = status;
+            status = newStatus;
             pianode.emit('statusChange', {
                 status: newStatus,
                 prevStatus: status
             });
-            prevStatus = status;
-            status = newStatus;
         }
     };
     var getStatus = function() {
@@ -157,7 +157,7 @@ function Pianode(userOptions) {
             },
             setStatus: setStatus,
             getStatus: function() {
-                return getStatus().status;
+                return status;
             },
             setState: setState
         });

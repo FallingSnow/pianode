@@ -69,9 +69,17 @@ static void BarMainLoadProxy (const BarSettings_t *settings,
 	 * firewalled fellows) */
 	if (settings->controlProxy != NULL) {
 		/* control proxy overrides global proxy */
-		WaitressSetProxy (waith, settings->controlProxy);
+		if (!WaitressSetProxy (waith, settings->controlProxy)) {
+			/* if setting proxy fails, url is invalid */
+			BarUiMsg (settings, MSG_ERR, "Control proxy (%s) is invalid!\n",
+					 settings->controlProxy);
+		}
 	} else if (settings->proxy != NULL && strlen (settings->proxy) > 0) {
-		WaitressSetProxy (waith, settings->proxy);
+		if (!WaitressSetProxy (waith, settings->proxy)) {
+			/* if setting proxy fails, url is invalid */
+			BarUiMsg (settings, MSG_ERR, "Proxy (%s) is invalid!\n",
+					 settings->proxy);
+		}
 	}
 }
 
@@ -98,16 +106,23 @@ static bool BarMainLoginUser (BarApp_t *app) {
  */
 static bool BarMainGetLoginCredentials (BarSettings_t *settings,
 		BarReadlineFds_t *input) {
+	bool usernameFromConfig = true;
+
 	if (settings->username == NULL) {
 		char nameBuf[100];
 
 		BarUiMsg (settings, MSG_QUESTION, "Email: ");
 		BarReadlineStr (nameBuf, sizeof (nameBuf), input, BAR_RL_DEFAULT);
 		settings->username = strdup (nameBuf);
+		usernameFromConfig = false;
 	}
 
 	if (settings->password == NULL) {
 		char passBuf[100];
+
+		if (usernameFromConfig) {
+			BarUiMsg (settings, MSG_QUESTION, "Email: %s\n", settings->username);
+		}
 
 		if (settings->passwordCmd == NULL) {
 			BarUiMsg (settings, MSG_QUESTION, "Password: ");
@@ -163,8 +178,7 @@ static bool BarMainGetLoginCredentials (BarSettings_t *settings,
 					return false;
 				}
 			}
-
-		}
+		} /* end else passwordCmd */
 	}
 
 	return true;
@@ -400,15 +414,11 @@ static void BarMainLoop (BarApp_t *app) {
 
 int main (int argc, char **argv) {
 	static BarApp_t app;
-	/* terminal attributes _before_ we started messing around with ~ECHO */
-	struct termios termOrig;
 
 	memset (&app, 0, sizeof (app));
 
 	/* save terminal attributes, before disabling echoing */
-	BarTermSave (&termOrig);
-	BarTermSetEcho (0);
-	BarTermSetBuffer (0);
+	BarTermInit ();
 
 	/* signals */
 	signal (SIGPIPE, SIG_IGN);
@@ -492,7 +502,7 @@ int main (int argc, char **argv) {
 	BarSettingsDestroy (&app.settings);
 
 	/* restore terminal attributes, zsh doesn't need this, bash does... */
-	BarTermRestore (&termOrig);
+	BarTermRestore ();
 
 	return 0;
 }
