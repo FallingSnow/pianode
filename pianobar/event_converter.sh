@@ -8,11 +8,13 @@ while read L; do
         export "$k=$v"
 done < <(grep -e '^\(title\|artist\|album\|stationName\|pRet\|pRetStr\|wRet\|wRetStr\|songDuration\|songPlayed\|rating\|songDuration\|songPlayed\|coverArt\|stationCount\|station[0-9]\+\)=' /dev/stdin)
 
+EVENT='{"artist":"'$artist'", "title":"'$title'", "station":"'$stationName'", "rating":"'$rating'", "art":"'$coverArt'", "album":"'$album'"}'
+
 case "$1" in
         songstart)
-        echo -e '{"artist":"$artist", "title":"$title", "station":"$stationName", "rating":"$rating", "art":"$coverArt", "album":"$album"}\r\n' | socat unix-connect:"$interpreter" STDIO
+        echo -e $EVENT'\r\n' | socat unix-connect:"$interpreter" STDIO
 ;;
         songlove)
-        echo -e '{"artist":"$artist", "title":"$title", "station":"$stationName", "rating":"$rating", "art":"$coverArt", "album":"$album"}\r\n' | socat unix-connect:"$interpreter" STDIO
+        echo -e $EVENT'\r\n' | socat unix-connect:"$interpreter" STDIO
 ;;
 esac

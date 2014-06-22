@@ -16,12 +16,14 @@ function Pianode(userOptions) {
     var pianode = this;
 
     pianode.currentInfo = {};
+    pianode.stations = {};
 
     // Create socket file for events
     pianode.socket = net.createServer(function(c) { //'connection' listener
         console.log('Socket: Created');
         c.on('data', function(data) {
-            pianode.currentInfo = JSON.parse(data);
+            options = _.extend(options, userOptions);
+            pianode.currentInfo = _.extend(pianode.currentInfo, JSON.parse(data.toString()));
         }).on('error', function(err) {
             console.error('Socket error:', err);
         }).end('end', function() {
@@ -165,7 +167,7 @@ function Pianode(userOptions) {
 
             // Call routes
             processIo({
-                data: data,
+                data: data.toString(),
                 write: function(data) {
                     pianobar.stdin.write(data + '\n');
                     //pianobar.stdin.end();
@@ -179,7 +181,8 @@ function Pianode(userOptions) {
                 options: options,
                 getState: getState,
                 setState: setState,
-                setStateOff: setStateOff
+                setStateOff: setStateOff,
+                pianode: pianode
             });
         });
 
