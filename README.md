@@ -26,6 +26,9 @@ The only thing you have to make sure additionally is that the listed lib depende
 - libgnutls-dev
 - libjson0-dev
 - libgcrypt11-dev
+- socat
+
+Socat is used for interproccess unix socket communication between pianobar and pianode.
 
 If your distribution uses `apt` just run this command, if not find and install the above listed packages in the available package manager. They are available for a lot of other distributions under the same name.
 
