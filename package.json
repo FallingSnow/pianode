@@ -7,17 +7,18 @@
     "music",
     "pandora",
     "radio",
-    "linux"
+    "linux",
+    "headerless"
   ],
   "author": "Philipp Widdra <philipp.widdra@googlemail.com>",
-  "contributors": "Ayrton Sparling",
-  "homepage": "https://github.com/FallingSnow/pianode",
+  "contributors": "Ayrton Sparling <ayrton@sparling.us>",
+  "homepage": "https://github.com/philippwiddra/pianode",
   "readmeFilename": "README.md",
   "main": "pianode.js",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/FallingSnow/pianode.git"
+    "url": "https://github.com/philippwiddra/pianode.git"
   },
   "issues": {
     "url": "https://github.com/philippwiddra/pianode/issues"
