@@ -18,47 +18,6 @@ function Pianode(userOptions) {
     pianode.currentInfo = {};
     pianode.stations = {};
 
-    // Create socket file for events
-    pianode.socket = net.createServer(function(c) { //'connection' listener
-        console.log('Socket: Created');
-        c.on('data', function(data) {
-            options = _.extend(options, userOptions);
-            pianode.currentInfo = _.extend(pianode.currentInfo, JSON.parse(data.toString()));
-        }).on('error', function(err) {
-            console.error('Socket error:', err);
-        }).end('end', function() {
-            console.log('Socket: End of data');
-        });
-    });
-
-    pianode.socket.socketConnections = [];
-    pianode.socket.on('connection', function(socket) {
-        pianode.socket.socketConnections.push(socket);
-    });
-
-    pianode.socket.on('error', function(e) {
-        if (e.code === 'EADDRINUSE') {
-            var clientSocket = new net.Socket();
-            clientSocket.on('error', function(e) { // handle error trying to talk to server
-                if (e.code === 'ECONNREFUSED') {  // No other server listening
-                    fs.unlinkSync(sockPath);
-                    pianode.socket.listen(sockPath, function() { //'listening' listener
-                        console.log('Socket: Server recovered');
-                    });
-                }
-                clientSocket.connect({path: sockPath}, function() {
-                    throw 'Socket: Running, giving up...';
-                });
-            });
-        }
-    });
-
-    pianode.socket.listen(sockPath, function() {
-        console.log('Socket: Listening!');
-    });
-
-    events.EventEmitter.call(pianode);
-
     // Check if userOptions hold all neccessary fields
     if (!(userOptions.password && userOptions.email)) {
         throw 'Pianode error: You have to specify pandora.com credentials.';
@@ -68,6 +27,7 @@ function Pianode(userOptions) {
         station: 'Q',
         verbose: false,
         logErrors: true,
+        startPaused: false,
         password: '',
         email: ''
     };
@@ -75,11 +35,47 @@ function Pianode(userOptions) {
         options = _.extend(options, userOptions);
     }
 
+    // Create socket file for events
+    pianode.socket = net.createServer(function (c) { //'connection' listener
+        c.on('data', function (data) {
+            pianode.currentInfo = _.extend(pianode.currentInfo, JSON.parse(data.toString()));
+            pianode.emit('songChange');
+        }).on('error', function (err) {
+            console.error('Socket error:', err);
+        }).end('end', function () {
+            console.log('Socket: End of data');
+        });
+    });
+
+    pianode.socket.on('error', function (e) {
+        if (e.code === 'EADDRINUSE') {
+            fs.unlinkSync(sockPath);
+//            var clientSocket = new net.Socket();
+//                clientSocket.on('error', function (e) { // handle error trying to talk to server
+//                    if (e.code === 'ECONNREFUSED') {  // No other server listening
+//                        fs.unlinkSync(sockPath);
+            pianode.socket.listen(sockPath, function () {
+                console.log('Socket: Server recovered');
+            });
+//                    }
+//                    clientSocket.connect({path: sockPath}, function () {
+//                        throw 'Socket: Running, giving up...';
+//                    });
+//                });
+        }
+    });
+
+    pianode.socket.listen(sockPath, function () {
+        console.log('Socket: Listening!');
+    });
+
+    events.EventEmitter.call(pianode);
+
     var state = {};
-    var setState = function(newState) {
+    var setState = function (newState) {
         state = _.extend(state, newState);
     };
-    var setStateOff = function() {
+    var setStateOff = function () {
         setState({
             running: false,
             loggedIn: false,
@@ -87,14 +83,14 @@ function Pianode(userOptions) {
         });
     };
     setStateOff();
-    var getState = function() {
+    var getState = function () {
         return state;
     };
     pianode.getState = getState;
 
     var status = 'not running';
     var prevStatus = 'undefined';
-    var setStatus = function(newStatus) {
+    var setStatus = function (newStatus) {
         if (newStatus !== status) {
             prevStatus = status;
             status = newStatus;
@@ -104,7 +100,7 @@ function Pianode(userOptions) {
             });
         }
     };
-    var getStatus = function() {
+    var getStatus = function () {
         return {
             status: status,
             prevStatus: prevStatus
@@ -112,11 +108,17 @@ function Pianode(userOptions) {
     };
     pianode.getStatus = getStatus;
 
-    var log = function(message) {
+    var writeToFifo = function (message) {
+        fs.appendFile(pianodeRoot + '/pianobar/ctrl', message, function (err) {
+            if (err) logError(err);
+        });
+    };
+
+    var log = function (message) {
         if (options.verbose)
             console.log(message);
     };
-    var logError = function(message) {
+    var logError = function (message) {
         if (options.logErrors)
             console.log(message);
     };
@@ -141,7 +143,7 @@ function Pianode(userOptions) {
     pianode.changeStation = functions.changeStation;
 
 
-    pianode.start = function() {
+    pianode.start = function () {
 
         pianobar = spawn(pianobarPath, [], {
             stdio: 'pipe',
@@ -151,28 +153,29 @@ function Pianode(userOptions) {
         });
 
         functions.setUp({
-            write: function(data) {
+            write: function (data) {
                 pianobar.stdin.write(data + '\n');
                 //pianobar.stdin.end();
             },
+            writeToFifo: writeToFifo,
             setStatus: setStatus,
-            getStatus: function() {
+            getStatus: function () {
                 return status;
             },
             setState: setState
         });
 
-        pianobar.stdout.on('data', function(data) {
+        pianobar.stdout.on('data', function (data) {
             log(data.toString());
 
             // Call routes
             processIo({
                 data: data.toString(),
-                write: function(data) {
+                write: function (data) {
                     pianobar.stdin.write(data + '\n');
                     //pianobar.stdin.end();
                 },
-                emit: function(event, obj) {
+                emit: function (event, obj) {
                     pianode.emit(event, obj);
                 },
                 setStatus: setStatus,
@@ -186,7 +189,7 @@ function Pianode(userOptions) {
             });
         });
 
-        pianobar.stderr.on('data', function(data) {
+        pianobar.stderr.on('data', function (data) {
             logError('Pianobar error: ' + data);
             pianode.emit('error', {
                 type: 'Unknown error',
@@ -196,7 +199,7 @@ function Pianode(userOptions) {
             setStateOff();
         });
 
-        pianobar.on('close', function(code) {
+        pianobar.on('close', function (code) {
             logError('Pianobar exited with code ' + code + '.');
             pianode.emit('close', code);
             setStatus('not running');
@@ -204,7 +207,7 @@ function Pianode(userOptions) {
         });
     };
 
-    pianode.stop = function() {
+    pianode.stop = function () {
         if (pianode.stopping)
             return;
         pianode.stopping = true;
@@ -218,7 +221,7 @@ function Pianode(userOptions) {
 
         pianode.socket.close();
 
-        setTimeout(function() {
+        setTimeout(function () {
             process.exit();
         }, 300);
     };

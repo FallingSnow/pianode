@@ -24,7 +24,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "underscore": ">= 1.6.0"
+    "underscore": ">= 1.6.0",
+    "github-download": ">= 0.3.0"
   },
   "engines": {
     "node": ">= 0.10.x",

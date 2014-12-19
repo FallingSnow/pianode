@@ -33,7 +33,7 @@ Socat is used for interproccess unix socket communication between pianobar and p
 If your distribution uses `apt` just run this command, if not find and install the above listed packages in the available package manager. They are available for a lot of other distributions under the same name.
 
 ``` bash
-sudo apt-get install libao-dev libmad0-dev libfaad-dev libgnutls-dev libjson0-dev libgcrypt11-dev
+sudo apt-get install libao-dev libmad0-dev libfaad-dev libgnutls-dev libjson0-dev libgcrypt11-dev socat
 ```
 
 Next run this installation script for pianobar using `node lib/install.js`
@@ -140,6 +140,29 @@ var statusChange = {
 ```
 see [*Status Values*](#status-values)
 
+### `currentInfo`
+``` javascript
+var currentInfo = {
+  album: "...",
+  art: "...",
+  artist: "...",
+  rating: "0-10",
+  station: "...",
+  title: "..."
+};
+```
+
+### `stationsList`
+``` javascript
+var stationsList = {
+  0: "... Radio"
+  1: "... Radio",
+  2: "... Radio",
+  3: "... Radio",
+  4: "QuickMix"
+};
+```
+
 ## Error Types
 Possible values of `error.type`:
 
@@ -150,9 +173,10 @@ Possible values of `error.type`:
 ## Options
 ``` javascript
 var options = {
-  station: 10,
+  station: Q, (integer or Q for quickmix)
   verbose: true,
-  errorLog: true
+  errorLog: true,
+  startPaused: false,
 };
 ```
 
@@ -187,9 +211,9 @@ ok      | [?] Email:
 ok      | &#124;>  Station "QuickMix" (1057370371552570017)
 ok      | &#124;>  "Ice Ice Baby" by "Vanilla Ice" on "To The Extreme" @ 90s Pop Radio
 ok      | #   -04:24/04:31
-        | 0) q   90s Pop Radio
-        | 0) Q   90s Pop Radio
-        | 0)     90s Pop Radio
+ok      | 0) q   90s Pop Radio
+ok      | 0) Q   90s Pop Radio
+ok      | 0)     90s Pop Radio
         | 0) Aerosmith - I Don't Want To Miss A Thing
         | 0) Aphrodite - Return To Jedda
 ok      | Network error: Read error.
@@ -223,7 +247,7 @@ ok      | Error: Pandora is not available in your country. Set up a control prox
     - songExplain()
     - songInfo()
 - Requesting input
-    - switchStation(identifier)
+    - changeStation(identifier)
     - songMove(newStation) *???*
     - stationCreate() *???*
     - stationDelete() *???*

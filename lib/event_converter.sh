@@ -1,7 +1,7 @@
 #!/bin/bash
 
 fold=$(dirname $0)
-interpreter="$fold/interpreter.sock"
+interpreter="$fold/../pianobar/interpreter.sock"
 while read L; do
         k="`echo "$L" | cut -d '=' -f 1`"
         v="`echo "$L" | cut -d '=' -f 2`"
