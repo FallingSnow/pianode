@@ -33,3 +33,5 @@ pianobar/src/ui_readline.o
 nbproject
 /nbproject/
 /HomeServer/
+/pianobar/
+/npm-debug.log

@@ -25,8 +25,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "underscore": ">= 1.6.0",
-    "github-download": ">= 0.3.0"
+    "github-download": ">= 0.3.0",
+    "node-gyp": "^3.3.0",
+    "underscore": ">= 1.6.0"
   },
   "engines": {
     "node": ">= 0.10.x",
@@ -34,9 +35,9 @@
   },
   "scripts": {
     "start": "node pianode.js",
-    "preinstall": "node lib/install.js",
     "install": "node lib/install.js",
+    "postinstall": "node lib/install.js",
     "uninstall": "node lib/install.js"
   },
-  "os": [ "!win32" ]
+  "os" : [ "!win32" ]
 }
